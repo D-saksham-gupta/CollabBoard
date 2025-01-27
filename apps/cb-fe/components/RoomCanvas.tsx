@@ -28,22 +28,13 @@ export function RoomCanvas({ roomId }: { roomId: string }) {
     return (
       <div className="flex justify-center items-center">
         {/* <Loader size="lg" className="items-center" />; */}
-        Loading...
+        Connecting to Server...
       </div>
     );
   }
   return (
     <div>
       <Canvas roomId={roomId} socket={socket} />
-
-      <div className="absolute bottom-0 right-0">
-        <button className="bg-white text-red-300 p-3 m-4 rounded-md">
-          Rect
-        </button>
-        <button className="bg-white text-red-300 p-3 m-4 rounded-md">
-          Circle
-        </button>
-      </div>
     </div>
   );
 }
