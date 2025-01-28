@@ -1,9 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { IconButton } from "./IconButton";
-import { Circle, Pencil, RectangleHorizontalIcon, Text } from "lucide-react";
+import {
+  ArrowBigDown,
+  Circle,
+  MoveDownRight,
+  Pencil,
+  RectangleHorizontalIcon,
+  TextCursor,
+} from "lucide-react";
 import { Game } from "@/draw/Game";
 
-export type Tool = "circle" | "rect" | "pencil" | "write";
+export type Tool = "circle" | "rect" | "pencil" | "write" | "arrow";
 
 export function Canvas({
   roomId,
@@ -57,13 +64,14 @@ function Topbar({
 }) {
   return (
     <div
+      className="bg-slate-800 rounded-md "
       style={{
         position: "fixed",
         top: 10,
         left: 10,
       }}
     >
-      <div className="flex gap-2">
+      <div className="flex gap-4 p-2.5">
         <IconButton
           onClick={() => {
             setSelectedTool("pencil");
@@ -90,7 +98,14 @@ function Topbar({
             setSelectedTool("write");
           }}
           activated={selectedTool === "write"}
-          icon={<Text />}
+          icon={<TextCursor />}
+        />
+        <IconButton
+          onClick={() => {
+            setSelectedTool("arrow");
+          }}
+          activated={selectedTool === "arrow"}
+          icon={<MoveDownRight />}
         />
       </div>
     </div>

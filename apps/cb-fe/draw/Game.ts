@@ -1,6 +1,5 @@
 import { Tool } from "@/components/Canvas";
 import { getExistingShapes } from "./http";
-import { text } from "stream/consumers";
 
 type Shape =
   | {
@@ -28,6 +27,13 @@ type Shape =
       text: string;
       x: number;
       y: number;
+    }
+  | {
+      type: "arrow";
+      x1: number;
+      y1: number;
+      x2: number;
+      y2: number;
     };
 
 export class Game {
@@ -62,7 +68,7 @@ export class Game {
     this.canvas.removeEventListener("mousemove", this.mouseMoveHandler);
   }
 
-  setTool(tool: "circle" | "pencil" | "rect" | "write") {
+  setTool(tool: "circle" | "pencil" | "rect" | "write" | "arrow") {
     this.selectedTool = tool;
   }
 
@@ -94,7 +100,6 @@ export class Game {
         this.ctx.strokeStyle = "rgba(255, 255, 255)";
         this.ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
       } else if (shape.type === "circle") {
-        console.log(shape);
         this.ctx.beginPath();
         this.ctx.arc(
           shape.centerX,
@@ -113,7 +118,31 @@ export class Game {
       } else if (shape.type === "write") {
         this.ctx.font = "15px Arial";
         this.ctx.fillStyle = "rgba(255, 255, 255)";
-        this.ctx.fillText("hi there", shape.x, shape.y);
+        this.ctx.fillText(shape.text, shape.x, shape.y);
+      } else if (shape.type === "arrow") {
+        const headLength = 10; // Length of the arrowhead
+        const angle = Math.atan2(shape.y2 - shape.y1, shape.x2 - shape.x1); // Angle of the line
+
+        // Draw the main line
+        this.ctx.beginPath();
+        this.ctx.moveTo(shape.x1, shape.y1);
+        this.ctx.lineTo(shape.x2, shape.y2);
+        this.ctx.stroke();
+
+        // Draw the arrowhead
+        this.ctx.beginPath();
+        this.ctx.moveTo(shape.x2, shape.y2);
+        this.ctx.lineTo(
+          shape.x2 - headLength * Math.cos(angle - Math.PI / 6),
+          shape.y2 - headLength * Math.sin(angle - Math.PI / 6)
+        );
+        this.ctx.lineTo(
+          shape.x2 - headLength * Math.cos(angle + Math.PI / 6),
+          shape.y2 - headLength * Math.sin(angle + Math.PI / 6)
+        );
+        this.ctx.lineTo(shape.x2, shape.y2);
+        this.ctx.fillStyle = "white"; // Arrowhead color
+        this.ctx.fill();
       }
     });
   }
@@ -158,11 +187,22 @@ export class Game {
         endY: endY,
       };
     } else if (selectedTool === "write") {
+      const text = prompt("Enter text");
+      if (text) {
+        shape = {
+          type: "write",
+          text,
+          x: this.startX,
+          y: this.startY,
+        };
+      }
+    } else if (selectedTool === "arrow") {
       shape = {
-        type: "write",
-        text: "hi there",
-        x: this.startX,
-        y: this.startY,
+        type: "arrow",
+        x1: this.startX,
+        y1: this.startY,
+        x2: e.clientX,
+        y2: e.clientY,
       };
     }
 
@@ -207,10 +247,18 @@ export class Game {
         this.ctx.moveTo(this.startX, this.startY);
         this.ctx.lineTo(Math.abs(e.clientX), Math.abs(e.clientY));
         this.ctx.stroke();
-      } else if (selectedTool === "write") {
-        this.ctx.font = "15px Arial";
-        this.ctx.fillStyle = "white";
-        this.ctx.fillText("hi there", this.startX, this.startY);
+      }
+      // else if (selectedTool === "write") {
+      //   this.ctx.font = "15px Arial";
+      //   this.ctx.fillStyle = "white";
+      //   this.ctx.fillText(, this.startX, this.startY);
+      // }
+      else if (selectedTool === "arrow") {
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = "white";
+        this.ctx.moveTo(this.startX, this.startY);
+        this.ctx.lineTo(Math.abs(e.clientX), Math.abs(e.clientY));
+        this.ctx.stroke();
       }
     }
   };
