@@ -1,0 +1,8 @@
+{
+  "build": {
+    "env": {
+      "NODE_VERSION": "18",
+      "NPM_CONFIG_REGISTRY": "https://registry.npmjs.org/"
+    }
+  }
+}
